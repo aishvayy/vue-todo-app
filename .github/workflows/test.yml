@@ -12,13 +12,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: 20
         cache: 'npm'
     
     - name: Cache Cypress binary
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/Cypress
@@ -34,15 +34,30 @@ jobs:
       run: npx cypress install
     
     - name: Start dev server
-      run: npm run dev &
+      run: |
+        npm run dev > vite.log 2>&1 &
+        echo "Vite server started in background"
     
     - name: Wait for dev server
       run: npx wait-on http://localhost:5173
       
     - name: Verify app is running
       run: |
-        sleep 5
+        sleep 10
+        curl -v http://localhost:5173
         curl -f http://localhost:5173 || exit 1
+        
+    - name: Debug - Check server process
+      run: |
+        ps aux | grep vite
+        netstat -tlnp | grep 5173 || ss -tlnp | grep 5173
+        
+    - name: Debug - Check Vite logs
+      run: |
+        if [ -f vite.log ]; then
+          echo "=== Vite Logs ==="
+          tail -50 vite.log
+        fi
     
     - name: Run Cypress tests
       run: npm run test:e2e

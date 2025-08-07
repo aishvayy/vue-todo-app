@@ -1,8 +1,9 @@
 describe('Todo App', () => {
   beforeEach(() => {
     cy.visit('http://localhost:5173');
-    // Wait for the app to be fully loaded
-    cy.get('h1').should('contain', 'My Todo List');
+    // Wait for the app to be fully loaded with retry
+    cy.get('body', { timeout: 30000 }).should('be.visible');
+    cy.get('h1', { timeout: 30000 }).should('contain', 'My Todo List');
   });
 
   it('adds and removes a todo item', () => {

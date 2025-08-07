@@ -1,12 +1,24 @@
 describe('Todo App', () => {
   beforeEach(() => {
     cy.visit('http://localhost:5173');
+    // Wait for the app to be fully loaded
+    cy.get('h1').should('contain', 'My Todo List');
   });
 
   it('adds and removes a todo item', () => {
-    cy.get('input').type('Write demo test{enter}');
-    cy.contains('Write demo test');
-    cy.get('button').click();
+    // Wait for the input to be available and visible
+    cy.get('input[placeholder="Add task"]').should('be.visible');
+    
+    // Type the todo item
+    cy.get('input[placeholder="Add task"]').type('Write demo test{enter}');
+    
+    // Verify the todo was added
+    cy.contains('Write demo test').should('be.visible');
+    
+    // Click the delete button (❌) for the first todo
+    cy.get('button').first().click();
+    
+    // Verify the todo was removed
     cy.contains('Write demo test').should('not.exist');
   });
 });

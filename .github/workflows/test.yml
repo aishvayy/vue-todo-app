@@ -10,11 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    
     - uses: actions/setup-node@v3
       with:
         node-version: 18
-    - run: npm install
-    - run: npm run dev &
-    - run: npx wait-on http://localhost:5173
-    - run: npm run test:e2e
+        cache: 'npm'
+    
+    - name: Cache Cypress binary
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/Cypress
+          node_modules
+        key: cypress-cache-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          cypress-cache-${{ runner.os }}-
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Install Cypress binary
+      run: npx cypress install
+    
+    - name: Start dev server
+      run: npm run dev &
+    
+    - name: Wait for dev server
+      run: npx wait-on http://localhost:5173
+    
+    - name: Run Cypress tests
+      run: npm run test:e2e

@@ -6,6 +6,13 @@ describe('Todo App', () => {
     cy.get('h1', { timeout: 30000 }).should('contain', 'My Todo List');
   });
 
+  it('should display the correct heading', () => {
+    // Check that the heading exists and has the correct text
+    cy.get('h1').should('be.visible');
+    cy.get('h1').should('contain', 'My Todo List');
+    cy.get('h1').should('have.text', 'My Todo List');
+  });
+
   it('adds and removes a todo item', () => {
     // Wait for the input to be available and visible
     cy.get('input[placeholder="Add task"]').should('be.visible');
